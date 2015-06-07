@@ -1,0 +1,81 @@
+$("#ajaxform").submit(function(e)
+{
+    var postData = $(this).serializeArray();
+    var formURL = $(this).attr("action");
+    var username = $('form')[0].username.value;
+    var comment = $('form')[0].comment.value;
+    var user = $('.post_comment .avatar img').attr('src').split('/').pop();
+
+    $.ajax({
+        url : formURL,
+        type: "POST",
+        data : postData,
+        success:function(data, textStatus, jqXHR) {
+            $(".comments").prepend(''
+                + '<div class="comment group">'
+                + '    <div class="avatar">'
+                + '        <img src="http://www.gravatar.com/avatar/'+user+'">'
+                + '    </div>'
+                + '    <div class="comment_box">'
+                + '        <span class="date">a moment ago</span>'
+                + '        <div class="comment_container">'
+                + '            <a href="http://www.gravatar.com/'+user+'" class="user">'+username+'</a>'
+                + '            <br>'
+                + '            <span>'+comment+'</span>'
+                + '        </div>'
+                + '    </div>'
+                + '</div>'
+                + '');
+
+            $('form')[0].comment.value = '';
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if (errorThrown == 'Bad Request') {
+                errorThrown = 'Please Login to post comment';
+            }
+
+            alert(errorThrown);
+        }
+    });
+
+    e.preventDefault(); //STOP default action
+    e.unbind(); //unbind. to stop multiple form submit.
+});
+
+show_more = function (page) {
+    var type = $('form')[0].type.value;
+    page = page || 1;
+    $('#linker').remove();
+
+    console.log($(this));
+    $.get('/'+topic+'?type='+type+'&page='+page, function (e) {
+        e.forEach(function(comment) {
+            $(".comments").append(''
+                + '<div class="comment group">'
+                + '    <div class="avatar">'
+                + '        <img src="'+comment.avatar+'">'
+                + '    </div>'
+                + '    <div class="comment_box">'
+                + '        <span class="date">'+comment.display_date+'</span>'
+                + '        <div class="comment_container">'
+                + '            <a href="'+comment.username_link+'" class="user">'+comment.username+'</a>'
+                + '            <br>'
+                + '            <span>'+comment.comment+'</span>'
+                + '        </div>'
+                + '    </div>'
+                + '</div>'
+                + '');
+        });
+        
+        if ($('.comments .comment').size() < total_comments) {
+            show_more_link(page + 1);
+        }
+
+    });
+};
+
+show_more_link = function (page) {
+    $('body').append("<button id='linker' onClick='show_more("+page+")'>More</button>")
+}
+
+show_more_link(2);

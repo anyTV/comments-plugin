@@ -1,0 +1,50 @@
+{
+  "name": "anytv-node-boilerplate",
+  "version": "0.0.1",
+  "description": "REST API backend boilerplate",
+  "main": "server.js",
+  "dependencies": {
+    "MD5": "^1.2.2",
+    "anytv-node-cors": "latest",
+    "anytv-node-error-handler": "latest",
+    "anytv-node-importer": "latest",
+    "anytv-node-logger": "latest",
+    "anytv-node-mongo": "latest",
+    "anytv-node-mysql": "latest",
+    "async": "^1.2.0",
+    "body-parser": "latest",
+    "compression": "latest",
+    "cuddle": "latest",
+    "express": "latest",
+    "jade": "^1.10.0",
+    "lodash": "^3.9.3",
+    "method-override": "latest",
+    "moment": "^2.10.3",
+    "morgan": "latest",
+    "multer": "latest",
+    "squel": "^4.0.0",
+    "superagent": "^1.2.0"
+  },
+  "scripts": {
+    "start": "npm install && nodemon server.js",
+    "test": "make test",
+    "dev-test": "mocha tests -R spec -t 5000 -s 0 --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anyTV/anytv-node-boilerplate"
+  },
+  "keywords": [
+    "freedom"
+  ],
+  "author": "any.TV",
+  "bugs": {
+    "url": "https://github.com/anyTV/anytv-node-boilerplate/issues"
+  },
+  "homepage": "https://github.com/anyTV/anytv-node-boilerplate",
+  "devDependencies": {
+    "chai": "latest",
+    "mocha": "latest",
+    "supertest": "latest"
+  }
+}

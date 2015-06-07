@@ -1,0 +1,38 @@
+doctype
+html
+    head
+        title #{topic}
+        link(rel='stylesheet', href='/assets/stylesheet.css')
+        link(href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext', rel='stylesheet', type='text/css')
+    body
+        .post_comment.comment.group
+            .avatar
+                img(src=avatar)
+            .comment_box
+                if email && token && username
+                    form#ajaxform(method="POST", action="/#{topic}")
+                        textarea(name="comment")
+                        input(type="hidden", name="token", value=token)
+                        input(type="hidden", name="type", value=type)
+                        input(type="hidden", name="email", value=email)
+                        input(type="hidden", name="username", value=username)
+                        input(type="submit", value="Post", style="float:right")
+                else
+                    span.login-warning Please login to post
+        .comments
+            each comment in comments
+                .comment.group
+                    .avatar
+                        img(src=comment.avatar)
+                    .comment_box
+                        span.date #{comment.display_date}
+                        .comment_container
+                            a.user(href=comment.username_link) #{comment.username}
+                            br
+                            span #{comment.comment}
+        
+        script(type="text/javascript").
+            var total_comments = #{total},
+                topic = '#{topic}';
+        script(type="text/javascript", src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js")
+        script(type="text/javascript", src="/assets/comments.js")
