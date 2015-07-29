@@ -7,6 +7,11 @@ lib-cov
 *.pid
 *.gz
 
+*~
+
+*.swp
+*.swo
+
 pids
 results
 
@@ -15,3 +20,5 @@ node_modules
 
 trash
 sblm.sublime-workspace
+
+config/env/development.js

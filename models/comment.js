@@ -1,3 +1,5 @@
+'use strict';
+
 var config = require(__dirname + '/../config/config'),
     util = require(__dirname + '/../helpers/util'),
     logger = require('anytv-node-logger'),

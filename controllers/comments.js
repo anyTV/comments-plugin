@@ -1,3 +1,5 @@
+/* jslint node: true */
+
 'use strict';
 
 var config = require(__dirname + '/../config/config'),
@@ -35,7 +37,7 @@ exports.get_comments = function (req, res, next) {
             if (err) {
                 return next(err);
             }
-            
+
             _(result).forEach(function (comment) {
                 comment.avatar = 'http://www.gravatar.com/avatar/' + (MD5(comment.email.trim()));
                 comment.display_date = moment(comment.date_created).fromNow();
@@ -53,7 +55,7 @@ exports.get_comments = function (req, res, next) {
 exports.post_comments = function (req, res, next) {
     var reqs = util.get_data(['topic_id'], [], req.params),
         data = util.get_data(['token', 'username', 'type', 'email', 'comment'], [], req.body),
-        
+
         start = function () {
             if (typeof data === 'string' || typeof reqs === 'string') {
                 return next(data || reqs);
@@ -115,10 +117,11 @@ exports.get_comments_view = function (req, res, next) {
         },
 
         get_comments = function (err, userdata) {
+            var suppress;
             if (err) {
-                user.token && delete user.get_user_by_token;
-                user.username && delete user.username;
-                user.email && delete user.email;
+                suppress = user.token && delete user.get_user_by_token;
+                suppress = user.username && delete user.username;
+                suppress = user.email && delete user.email;
             }
 
             Comment.get_comments(data.topic_id, data.type, 1, get_total);
@@ -136,9 +139,9 @@ exports.get_comments_view = function (req, res, next) {
 
         send_response = function (err, result) {
             var to_render = user;
-            
+
             to_render.topic = data.topic_id;
-            
+
             if (err) {
                 return next(err);
             }
@@ -151,16 +154,15 @@ exports.get_comments_view = function (req, res, next) {
             }).commit();
 
             if (!user.email) {
-                user.email = "empty";
+                user.email = 'empty';
             }
 
             to_render.comments = comments;
             to_render.total = result;
             to_render.avatar = 'http://www.gravatar.com/avatar/' + (MD5(user.email.trim()));
-            
+
             res.render('comments', to_render);
         };
 
     start();
 };
-
