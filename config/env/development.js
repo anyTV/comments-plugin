@@ -1,5 +1,6 @@
 'use strict';
 
 module.exports = {
-    ENV: 'development'
+    ENV: 'development',
+    PORT: 9090
 };
