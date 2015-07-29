@@ -10,6 +10,7 @@ module.exports = function (router) {
     router.get('/:topic_id', c.comments.get_comments);
     router.post('/:topic_id', c.comments.post_comments);
     router.get('/embed/:topic_id', c.comments.get_comments_view);
+    router.get('/get_comment_threads/:video_id', c.youtube.get_comment_threads);
 
     router.all('*', function (req, res) {
         res.status(404)
