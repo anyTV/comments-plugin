@@ -8,6 +8,7 @@ var config = require(__dirname + '/../config/config'),
     MD5 = require('MD5'),
     _ = require('lodash'),
     moment = require('moment'),
+    cuddle = require('cuddle'),
     User = require(__dirname + '/../models/user'),
     Comment = require(__dirname + '/../models/comment');
 
@@ -98,6 +99,7 @@ exports.post_comments = function (req, res, next) {
 exports.get_comments_view = function (req, res, next) {
     var data = util.get_data(['topic_id'], [], req.params),
         user = util.get_data(['type'], ['token', 'email', 'username'], req.query),
+        comment_body,
         comments = [],
 
         start = function () {
@@ -124,7 +126,37 @@ exports.get_comments_view = function (req, res, next) {
                 suppress = user.email && delete user.email;
             }
 
+            if (user.type === 'gamers_video') {
+                cuddle.get
+                    .to('http://dev.gamers.tm:9090/youtube/get_comment_threads?video_id=' + data.topic_id)
+                    .send()
+                    .then(get_total_youtube);
+                return;
+            }
+
             Comment.get_comments(data.topic_id, data.type, 1, get_total);
+        },
+
+        get_total_youtube = function (err, result) {
+            if (err) {
+                return next(err);
+            }
+
+            _(result.items).forEach(function (comment) {
+                comment_body = comment.snippet.topLevelComment.snippet;
+                comments.push({
+                    email: 'empty',
+                    type: 'gamers_video',
+                    username: comment_body.authorDisplayName,
+                    topic: comment_body.videoId,
+                    comment: comment_body.textDisplay,
+                    avatar: comment_body.authorProfileImageUrl,
+                    display_date: moment(comment.date_created).fromNow(comment_body.publishedAt),
+                    username_link: comment_body.authorChannelUrl
+                });
+            }).commit();
+
+            send_response(null, result.items.length);
         },
 
         get_total = function (err, result) {
@@ -133,6 +165,12 @@ exports.get_comments_view = function (req, res, next) {
             }
 
             comments = result;
+
+            _(comments).forEach(function (comment) {
+                comment.avatar = 'http://www.gravatar.com/avatar/' + (MD5(comment.email.trim()));
+                comment.display_date = moment(comment.date_created).fromNow();
+                comment.username_link = 'http://www.gravatar.com/' + (MD5(comment.email.trim()));
+            }).commit();
 
             Comment.get_total(data.topic_id, data.type, send_response);
         },
@@ -145,13 +183,6 @@ exports.get_comments_view = function (req, res, next) {
             if (err) {
                 return next(err);
             }
-
-            _(comments).forEach(function (comment) {
-                comment.avatar = 'http://www.gravatar.com/avatar/' + (MD5(comment.email.trim()));
-                comment.display_date = moment(comment.date_created).fromNow();
-                comment.username_link = 'http://www.gravatar.com/' + (MD5(comment.email.trim()));
-
-            }).commit();
 
             if (!user.email) {
                 user.email = 'empty';
