@@ -8,7 +8,25 @@ var config      = require(__dirname + '/config/config'),
     logger      = require('anytv-node-logger'),
     body_parser = require('body-parser'),
     express     = require('express'),
-    app         = express();
+    app         = express(),
+    session     = require('express-session'),
+    redis       = require('redis'),
+    redis_store = require('connect-redis')(session),
+    redis_store_session = new redis_store({
+        host: 'localhost',
+        port: 4444,
+        client: redis.createClient()
+    });
+
+app.use(session({
+    cookie: {
+        maxAge: 6000000
+    },
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: true,
+    store: redis_store_session
+}));
 
 logger.log('info', 'Starting', config.APP_NAME, 'on', config.ENV, 'environment');
 

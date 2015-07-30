@@ -8,9 +8,7 @@ var config = require(__dirname + '/../config/config'),
     google_auth_url = 'https://accounts.google.com/o/oauth2/token',
     util = require(__dirname + '/../helpers/util'),
     superagent = require('superagent'),
-    cuddle = require('cuddle'),
-    yt_access_token = 'ya29.wAEe41MpDE1hqNqXqPxuxuVJISFJLwNysfVjvoSq38Fju99uMVa_IPpSFi4qMSqleQDpxj4bHW8';
-    //req.session.youtube_chat.access_token
+    cuddle = require('cuddle');
 
 exports.get_comment_threads = function (req, res, next) {
     var params = util.get_data(['video_id'], ['next_page_token'], req.query),
@@ -23,7 +21,6 @@ exports.get_comment_threads = function (req, res, next) {
         },
 
         start = function () {
-            console.log(query);
             superagent.get(API_BASE_URL + '/commentThreads')
                 .set('Content-Type', 'application/json')
                 .set('Accept', 'application/json')
@@ -92,13 +89,13 @@ exports.post_comment_thread = function (req, res, next) {
         },
 
         start = function () {
-            // if (!req.session || !req.session.youtube_chat) {
-            //     response.error = 'Not logged in';
-            //     return send_response(null, response);
-            // }
+            if (!req.session || !req.session.youtube_chat) {
+                response.error = 'Not logged in';
+                return send_response(null, response);
+            }
 
             superagent.post(API_BASE_URL + '/commentThreads')
-                .set('Authorization', 'Bearer ' + yt_access_token)
+                .set('Authorization', 'Bearer ' + req.session.youtube_chat.access_token)
                 .set('Content-Type', 'application/json')
                 .set('Accept', 'application/json')
                 .query({
@@ -134,13 +131,13 @@ exports.post_comment = function (req, res, next) {
         },
 
         start = function () {
-            // if (!req.session || !req.session.youtube_chat) {
-            //     response.error = 'Not logged in';
-            //     return send_response(null, response);
-            // }
+            if (!req.session || !req.session.youtube_chat) {
+                response.error = 'Not logged in';
+                return send_response(null, response);
+            }
 
             superagent.post(API_BASE_URL + '/comments')
-                .set('Authorization', 'Bearer ' + yt_access_token)
+                .set('Authorization', 'Bearer ' + req.session.youtube_chat.access_token)
                 .set('Content-Type', 'application/json')
                 .set('Accept', 'application/json')
                 .query({
@@ -193,9 +190,7 @@ exports.chat_callback = function (req, res, next) {
                 return next('Error on authorization.');
             }
 
-            //store access token on session
-            //req.session.youtube_chat = result;
-            console.log('access_token', result);
+            req.session.youtube_chat = result;
 
             cuddle.get
                 .to('https://www.googleapis.com/youtube/v3/channels')
@@ -212,9 +207,7 @@ exports.chat_callback = function (req, res, next) {
                 return next(err);
             }
 
-            //store access token on session
-            //req.session.youtube_user = result;
-            console.log('user', result);
+            req.session.youtube_user = result;
 
             res.send({message:'ok'});
         };
