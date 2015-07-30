@@ -22,6 +22,7 @@ module.exports = function (router) {
     router.get('/youtube/get_comments', c.youtube.get_comments);
     router.get('/youtube/insert_comment_thread', c.youtube.post_comment_thread);
     router.get('/youtube/insert_comment', c.youtube.post_comment);
+    router.get('/youtube/chat_callback', c.youtube.chat_callback);
 
     router.all('*', function (req, res) {
         res.status(404)
