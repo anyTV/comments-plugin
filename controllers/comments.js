@@ -12,7 +12,6 @@ var config = require(__dirname + '/../config/config'),
     User = require(__dirname + '/../models/user'),
     Comment = require(__dirname + '/../models/comment');
 
-
 exports.get_comments = function (req, res, next) {
     var data = util.get_data(['topic_id'], [], req.params),
 
@@ -45,7 +44,6 @@ exports.get_comments = function (req, res, next) {
                 comment.username_link = 'http://www.gravatar.com/' + (MD5(comment.email.trim()));
 
             }).commit();
-
 
             res.send(result);
         };
@@ -82,7 +80,26 @@ exports.post_comments = function (req, res, next) {
             comment_data.type = data.type;
             comment_data.username = data.username;
 
+            if (data.type === 'gamers_video') {
+                return Comment.create_comment(comment_data, save_youtube_comment);
+            }
+
             Comment.create_comment(comment_data, send_response);
+        },
+
+        save_youtube_comment = function (err, result) {
+            if (err) {
+                return next(err);
+            }
+
+            cuddle.get
+                .to('http://dev.gamers.tm:9090/youtube/insert_comment_thread' +
+                    '?video_id=' + reqs.topic_id +
+                    '&channel_id=' + 'UCztAApmLSyQmgJW9DhQ6gfw' +
+                    '&comment_text=' + data.comment +
+                    '&access_token=' + req.session.youtube_chat.access_token)
+                .send()
+                .then(send_response);
         },
 
         send_response = function (err, result) {

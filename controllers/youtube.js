@@ -62,7 +62,7 @@ exports.get_comments = function (req, res, next) {
 
         send_response = function (err, result) {
             if (err) {
-                console.log(err);
+                return res.send({ err: err });
             }
 
             res.send(result.body);
@@ -72,7 +72,15 @@ exports.get_comments = function (req, res, next) {
 };
 
 exports.post_comment_thread = function (req, res, next) {
-    var params = util.get_data(['video_id', 'channel_id', 'comment_text'], [], req.query),
+    var params = util.get_data([
+                'video_id',
+                'channel_id',
+                'comment_text',
+                'access_token'
+            ],
+            [],
+            req.query
+        ),
         data = {
             snippet: {
                 videoId: params.video_id,
@@ -89,13 +97,8 @@ exports.post_comment_thread = function (req, res, next) {
         },
 
         start = function () {
-            if (!req.session || !req.session.youtube_chat) {
-                response.error = 'Not logged in';
-                return send_response(null, response);
-            }
-
             superagent.post(API_BASE_URL + '/commentThreads')
-                .set('Authorization', 'Bearer ' + req.session.youtube_chat.access_token)
+                .set('Authorization', 'Bearer ' + params.access_token)
                 .set('Content-Type', 'application/json')
                 .set('Accept', 'application/json')
                 .query({
@@ -119,7 +122,7 @@ exports.post_comment_thread = function (req, res, next) {
 };
 
 exports.post_comment = function (req, res, next) {
-    var params = util.get_data(['parent_id', 'comment_text'], [], req.query),
+    var params = util.get_data(['parent_id', 'comment_text', 'access_token'], [], req.query),
         data = {
             snippet:{
                 parentId: params.parent_id,
@@ -131,13 +134,8 @@ exports.post_comment = function (req, res, next) {
         },
 
         start = function () {
-            if (!req.session || !req.session.youtube_chat) {
-                response.error = 'Not logged in';
-                return send_response(null, response);
-            }
-
             superagent.post(API_BASE_URL + '/comments')
-                .set('Authorization', 'Bearer ' + req.session.youtube_chat.access_token)
+                .set('Authorization', 'Bearer ' + params.access_token)
                 .set('Content-Type', 'application/json')
                 .set('Accept', 'application/json')
                 .query({
