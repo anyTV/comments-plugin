@@ -151,7 +151,7 @@ exports.get_comments_view = function (req, res, next) {
                     topic: comment_body.videoId,
                     comment: comment_body.textDisplay,
                     avatar: comment_body.authorProfileImageUrl,
-                    display_date: moment(comment.date_created).fromNow(comment_body.publishedAt),
+                    display_date: moment(comment_body.publishedAt).fromNow(),
                     username_link: comment_body.authorChannelUrl
                 });
             }).commit();
