@@ -53,7 +53,8 @@ exports.get_comments = function (req, res, next) {
 
 exports.post_comments = function (req, res, next) {
     var reqs = util.get_data(['topic_id'], [], req.params),
-        data = util.get_data(['token', 'username', 'type', 'email', 'comment'], [], req.body),
+        data = util.get_data(['token', 'username', 'type', 'email'], ['comment'], req.body),
+        comment_data = {},
 
         start = function () {
             if (typeof data === 'string' || typeof reqs === 'string') {
@@ -64,8 +65,6 @@ exports.post_comments = function (req, res, next) {
         },
 
         validate_user = function (err, user) {
-            var comment_data = {};
-
             if (err) {
                 return next(err);
             }
@@ -73,6 +72,8 @@ exports.post_comments = function (req, res, next) {
             if (user.email !== data.email) {
                 return next('Invalid credentials');
             }
+
+            data.comment = data.comment || '';
 
             comment_data.email = user.email;
             comment_data.topic = reqs.topic_id;
@@ -93,13 +94,24 @@ exports.post_comments = function (req, res, next) {
             }
 
             cuddle.get
-                .to('http://dev.gamers.tm:9090/youtube/insert_comment_thread' +
+                .to(config.APP_BASE_URL + '/youtube/insert_comment_thread' +
                     '?video_id=' + reqs.topic_id +
                     '&channel_id=' + 'UCztAApmLSyQmgJW9DhQ6gfw' +
                     '&comment_text=' + data.comment +
-                    '&access_token=' + req.session.youtube_chat.access_token)
+                    '&access_token=' +
+                        (req.session && req.session.youtube_chat &&
+                        req.session.youtube_chat.access_token) || 'empty'
+                    )
                 .send()
-                .then(send_response);
+                .then(send_youtube_response);
+        },
+
+        send_youtube_response = function (err, result) {
+            if (err) {
+                return res.send({err: 'failed saving to youtube'});
+            }
+
+            send_response();
         },
 
         send_response = function (err, result) {
@@ -145,7 +157,7 @@ exports.get_comments_view = function (req, res, next) {
 
             if (user.type === 'gamers_video') {
                 cuddle.get
-                    .to('http://dev.gamers.tm:9090/youtube/get_comment_threads?video_id=' + data.topic_id)
+                    .to(config.APP_BASE_URL + '/youtube/get_comment_threads?video_id=' + data.topic_id)
                     .send()
                     .then(get_total_youtube);
                 return;
@@ -169,7 +181,8 @@ exports.get_comments_view = function (req, res, next) {
                     comment: comment_body.textDisplay,
                     avatar: comment_body.authorProfileImageUrl,
                     display_date: moment(comment_body.publishedAt).fromNow(),
-                    username_link: comment_body.authorChannelUrl
+                    username_link: comment_body.authorChannelUrl,
+                    reply_count: comment.snippet.totalReplyCount,
                 });
             }).commit();
 

@@ -26,7 +26,6 @@ $("#ajaxform").submit(function(e)
                 + '    </div>'
                 + '</div>'
                 + '');
-
             $('form')[0].comment.value = '';
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -66,7 +65,7 @@ show_more = function (page) {
                 + '</div>'
                 + '');
         });
-        
+
         if ($('.comments .comment').size() < total_comments) {
             show_more_link(page + 1);
         }

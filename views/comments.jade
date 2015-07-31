@@ -30,7 +30,9 @@ html
                             a.user(href=comment.username_link) #{comment.username}
                             br
                             span #{comment.comment}
-        
+                            br
+                            span #{comment.reply_count}
+
         script(type="text/javascript").
             var total_comments = #{total},
                 topic = '#{topic}';
