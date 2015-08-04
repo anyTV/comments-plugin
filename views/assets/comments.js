@@ -62,8 +62,7 @@ show_more = function (page) {
                 + '            <span>'+comment.comment+'</span>'
                 + '        </div>'
                 + '    </div>'
-                + '</div>'
-                + '');
+                + '</div>');
         });
 
         if ($('.comments .comment').size() < total_comments) {
@@ -71,6 +70,32 @@ show_more = function (page) {
         }
 
     });
+};
+
+var show_replies = function (comment_id, video_id, channel_id) {
+    $.get(
+        '/youtube/get_comments?video_id='+video_id+'&parent_id='+comment_id+'&channel_id='+channel_id,
+        function (result) {
+            console.log(result);
+            result.forEach(function(comment) {
+                $("#"+comment_id).append(''
+                    + '<div class="comment group">'
+                    + '    <div class="avatar">'
+                    + '        <img src="'+comment.avatar+'">'
+                    + '    </div>'
+                    + '    <div class="comment_box">'
+                    + '        <span class="date">'+comment.display_date+'</span>'
+                    + '        <div class="comment_container">'
+                    + '            <a href="'+comment.username_link+'" class="user">'+comment.username+'</a>'
+                    + '            <br>'
+                    + '            <span>'+comment.comment+'</span>'
+                    + '        </div>'
+                    + '    </div>'
+                    + '</div>');
+                    $("#repbtn_"+comment_id).style.display = 'none';
+            });
+        }
+    );
 };
 
 show_more_link = function (page) {

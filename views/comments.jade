@@ -10,15 +10,18 @@ html
                 img(src=avatar)
             .comment_box
                 if email && token && username
-                    form#ajaxform(method="POST", action="/#{topic}")
-                        textarea(name="comment")
-                        input(type="hidden", name="token", value=token)
-                        input(type="hidden", name="type", value=type)
-                        input(type="hidden", name="email", value=email)
-                        input(type="hidden", name="username", value=username)
-                        input(type="submit", value="Post", style="float:right")
+                    if !youtube_options.online
+                        a(href=youtube_options.oauth_link target='_parent') Login to Youtube
+                    else
+                        form#ajaxform(method="POST", action="/#{topic}")
+                            textarea(name="comment")
+                            input(type="hidden", name="token", value=token)
+                            input(type="hidden", name="type", value=type)
+                            input(type="hidden", name="email", value=email)
+                            input(type="hidden", name="username", value=username)
+                            input(type="submit", value="Post", style="float:right")
                 else
-                    span.login-warning Please login to post
+                        span.login-warning Please login to post
         .comments
             each comment in comments
                 .comment.group
@@ -31,7 +34,12 @@ html
                             br
                             span #{comment.comment}
                             br
-                            span #{comment.reply_count}
+                            if comment.reply_count
+                                span #{comment.reply_count} Replies
+                            if comment.reply_count > 0
+                                br
+                                button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id) Show Replies
+                                div.comment_replies(id=comment.comment_id)
 
         script(type="text/javascript").
             var total_comments = #{total},

@@ -8,6 +8,8 @@ var config = require(__dirname + '/../config/config'),
     google_auth_url = 'https://accounts.google.com/o/oauth2/token',
     util = require(__dirname + '/../helpers/util'),
     superagent = require('superagent'),
+    _ = require('lodash'),
+    moment = require('moment'),
     cuddle = require('cuddle');
 
 exports.get_comment_threads = function (req, res, next) {
@@ -50,6 +52,9 @@ exports.get_comments = function (req, res, next) {
             channelId: params.channel_id,
             parentId: params.parent_id,
         },
+        data = {},
+        comments = [],
+        comment_body,
 
         start = function () {
             superagent.get(API_BASE_URL + '/comments')
@@ -65,7 +70,18 @@ exports.get_comments = function (req, res, next) {
                 return res.send({ err: err });
             }
 
-            res.send(result.body);
+            _(result.body.items).forEach(function (comment) {
+                comment_body = comment.snippet;
+                comments.push({
+                    username: comment_body.authorDisplayName,
+                    comment: comment_body.textDisplay,
+                    display_date: moment(comment_body.publishedAt).fromNow(),
+                    username_link: comment_body.authorChannelUrl,
+                    avatar: comment_body.authorProfileImageUrl,
+                });
+            }).commit();
+
+            res.send(comments);
         };
 
     start();
@@ -165,6 +181,7 @@ exports.chat_callback = function (req, res, next) {
             client_secret: config.YOUTUBE.client_secret,
             redirect_uri: config.YOUTUBE.chat_redirect_uri
         },
+        //state = JSON.parse(req.query.state),
 
         start = function () {
             if (!req.query.code) {

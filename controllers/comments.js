@@ -10,7 +10,13 @@ var config = require(__dirname + '/../config/config'),
     moment = require('moment'),
     cuddle = require('cuddle'),
     User = require(__dirname + '/../models/user'),
-    Comment = require(__dirname + '/../models/comment');
+    Comment = require(__dirname + '/../models/comment'),
+    auth_params = {
+        client_id: config.YOUTUBE.client_id,
+        redirect_uri: config.YOUTUBE.chat_redirect_uri,
+        scope: config.YOUTUBE.scopes.manage,
+        response_type: 'code'
+    };
 
 exports.get_comments = function (req, res, next) {
     var data = util.get_data(['topic_id'], [], req.params),
@@ -127,9 +133,14 @@ exports.post_comments = function (req, res, next) {
 
 exports.get_comments_view = function (req, res, next) {
     var data = util.get_data(['topic_id'], [], req.params),
-        user = util.get_data(['type'], ['token', 'email', 'username'], req.query),
+        user = util.get_data(['type'], ['token', 'email', 'username', 'channel_id', 'user_id'], req.query),
         comment_body,
         comments = [],
+        to_render,
+        state = {},
+        youtube_options = {
+            online: true
+        },
 
         start = function () {
             if (typeof data === 'string') {
@@ -183,9 +194,23 @@ exports.get_comments_view = function (req, res, next) {
                     display_date: moment(comment_body.publishedAt).fromNow(),
                     username_link: comment_body.authorChannelUrl,
                     reply_count: comment.snippet.totalReplyCount,
+                    channel_id: comment.snippet.channelId,
+                    comment_id: comment.id,
+                    video_id: comment.snippet.videoId
                 });
             }).commit();
 
+            state.username = user.username;
+            state.type = user.type;
+            state.topic_id = data.topic_id;
+            state.token = user.token;
+            state.redirect_uri = config.YOUTUBE.gamerstm_youtuber_page +
+                user.user_id + '/list/' + user.channel_id + '/v/' + data.topic_id;
+            auth_params.state = JSON.stringify(state);
+
+            youtube_options.oauth_link = config.YOUTUBE.auth(auth_params);
+            youtube_options.online = !!(req.session && req.session.youtube_chat) ||
+                user.type !== 'gamers_video';
             send_response(null, result.items.length);
         },
 
@@ -197,16 +222,18 @@ exports.get_comments_view = function (req, res, next) {
             comments = result;
 
             _(comments).forEach(function (comment) {
-                comment.avatar = 'http://www.gravatar.com/avatar/' + (MD5(comment.email.trim()));
+                comment.avatar = 'http://www.gravatar.com/avatar/' +
+                    (MD5(comment.email.trim()));
+                comment.username_link = 'http://www.gravatar.com/' +
+                    (MD5(comment.email.trim()));
                 comment.display_date = moment(comment.date_created).fromNow();
-                comment.username_link = 'http://www.gravatar.com/' + (MD5(comment.email.trim()));
             }).commit();
 
             Comment.get_total(data.topic_id, data.type, send_response);
         },
 
         send_response = function (err, result) {
-            var to_render = user;
+            to_render = user;
 
             to_render.topic = data.topic_id;
 
@@ -221,7 +248,9 @@ exports.get_comments_view = function (req, res, next) {
             to_render.comments = comments;
             to_render.total = result;
             to_render.avatar = 'http://www.gravatar.com/avatar/' + (MD5(user.email.trim()));
+            to_render.youtube_options = youtube_options;
 
+            console.log(req.session);
             res.render('comments', to_render);
         };
 
