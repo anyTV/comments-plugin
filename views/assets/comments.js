@@ -74,33 +74,55 @@ show_more = function (page) {
 };
 
 var show_replies = function (comment_id, video_id, channel_id) {
-    $(event.currentTarget).hide();
-    $.get(
-        '/youtube/get_comments?video_id='+video_id+'&parent_id='+comment_id+'&channel_id='+channel_id,
-        function (result) {
-            console.log(result);
-            result.forEach(function(comment) {
-                console.log(comment.comment);
-                $("#"+comment_id).append(''
-                    + '<div class="comment group">'
-                    + '    <div class="avatar">'
-                    + '        <img src="'+comment.avatar+'">'
-                    + '    </div>'
-                    + '    <div class="comment_box">'
-                    + '        <span class="date">'+comment.display_date+'</span>'
-                    + '        <div class="comment_container">'
-                    + '            <a href="'+comment.username_link+'" class="user">'+comment.username+'</a>'
-                    + '            <br>'
-                    + '            <span>'+comment.comment+'</span>'
-                    + '        </div>'
-                    + '    </div>'
-                    + '</div>');
-                    //$("#repbtn_"+comment_id).style.display = 'none';
-            });
+    var target = $(event.currentTarget);
 
-            $("#"+comment_id).slideDown();
-        }
-    );
+    if(target.hasClass('unloaded')){
+        target.removeClass('unloaded');
+        target.addClass('loaded');
+        target.addClass('showing');
+        $.get(
+            '/youtube/get_comments?video_id='+video_id+'&parent_id='+comment_id+'&channel_id='+channel_id,
+            function (result) {
+                console.log(result);
+                result.forEach(function(comment) {
+                    console.log(comment.comment);
+                    $("#"+comment_id).append(''
+                        + '<div class="comment group">'
+                        + '    <div class="avatar">'
+                        + '        <img src="'+comment.avatar+'">'
+                        + '    </div>'
+                        + '    <div class="comment_box">'
+                        + '        <span class="date">'+comment.display_date+'</span>'
+                        + '        <div class="comment_container">'
+                        + '            <a href="'+comment.username_link+'" class="user">'+comment.username+'</a>'
+                        + '            <br>'
+                        + '            <span>'+comment.comment+'</span>'
+                        + '        </div>'
+                        + '    </div>'
+                        + '</div>');
+                        //$("#repbtn_"+comment_id).style.display = 'none';
+                });
+
+                $("#"+comment_id).slideDown();
+            });
+        target.text('Hide Replies');
+        return;
+    }
+
+    if(target.hasClass('showing')) {
+        target.text('Show Replies');
+        $("#"+comment_id).slideUp();
+        target.removeClass('showing');
+        target.addClass('hiding');
+        return;
+    }
+
+    if(target.hasClass('hiding') && target.hasClass('loaded')) {
+        $("#"+comment_id).slideDown();
+        target.text('Hide Replies');
+        target.removeClass('hiding');
+        target.addClass('showing');
+    }
 };
 
 show_more_link = function (page) {
