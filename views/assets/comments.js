@@ -103,7 +103,7 @@ var show_replies = function (comment_id, video_id, channel_id) {
                         //$("#repbtn_"+comment_id).style.display = 'none';
                 });
 
-                $("#"+comment_id).slideDown();
+                $("#"+comment_id).show();
             });
         target.text('Hide Replies');
         return;
@@ -111,14 +111,14 @@ var show_replies = function (comment_id, video_id, channel_id) {
 
     if(target.hasClass('showing')) {
         target.text('Show Replies');
-        $("#"+comment_id).slideUp();
+        $("#"+comment_id).hide();
         target.removeClass('showing');
         target.addClass('hiding');
         return;
     }
 
     if(target.hasClass('hiding') && target.hasClass('loaded')) {
-        $("#"+comment_id).slideDown();
+        $("#"+comment_id).show();
         target.text('Hide Replies');
         target.removeClass('hiding');
         target.addClass('showing');
