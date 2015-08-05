@@ -42,12 +42,11 @@ $("#ajaxform").submit(function(e)
 });
 
 show_more = function (page) {
-    var type = $('form')[0].type.value;
-    page = page || 1;
+    var page = page || 1;
     $('#linker').remove();
 
     console.log($(this));
-    $.get('/'+topic+'?type='+type+'&page='+page, function (e) {
+    $.get('/'+topic+'?type=gamers_video'+'&page='+page, function (e) {
         e.forEach(function(comment) {
             $(".comments").append(''
                 + '<div class="comment group">'
@@ -73,11 +72,13 @@ show_more = function (page) {
 };
 
 var show_replies = function (comment_id, video_id, channel_id) {
+    $(event.currentTarget).hide();
     $.get(
         '/youtube/get_comments?video_id='+video_id+'&parent_id='+comment_id+'&channel_id='+channel_id,
         function (result) {
             console.log(result);
             result.forEach(function(comment) {
+                console.log(comment.comment);
                 $("#"+comment_id).append(''
                     + '<div class="comment group">'
                     + '    <div class="avatar">'
@@ -92,7 +93,7 @@ var show_replies = function (comment_id, video_id, channel_id) {
                     + '        </div>'
                     + '    </div>'
                     + '</div>');
-                    $("#repbtn_"+comment_id).style.display = 'none';
+                    //$("#repbtn_"+comment_id).style.display = 'none';
             });
         }
     );
