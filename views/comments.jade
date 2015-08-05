@@ -11,7 +11,7 @@ html
             .comment_box
                 if email && token && username
                     if !youtube_options.online
-                        a(href=youtube_options.oauth_link target='_parent') Login to Youtube
+                        a(href=youtube_options.oauth_link target='_parent' class='login') Login to Youtube
                     else
                         form#ajaxform(method="POST", action="/#{topic}")
                             textarea(name="comment")
@@ -19,7 +19,7 @@ html
                             input(type="hidden", name="type", value=type)
                             input(type="hidden", name="email", value=email)
                             input(type="hidden", name="username", value=username)
-                            input(type="submit", value="Post", style="float:right")
+                            input(type="submit", value="Post", class="post-button", style="float:right")
                 else
                         span.login-warning Please login to post
         .comments
@@ -28,17 +28,17 @@ html
                     .avatar
                         img(src=comment.avatar)
                     .comment_box
-                        span.date #{comment.display_date}
                         .comment_container
                             a.user(href=comment.username_link) #{comment.username}
+                            span.date #{comment.display_date}
                             br
                             span #{comment.comment}
-                            br
-                            if comment.reply_count
-                                span #{comment.reply_count} Replies
                             if comment.reply_count > 0
                                 br
-                                button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id) Show Replies
+                                if comment.reply_count == 1
+                                    button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id) View #{comment.reply_count} Reply
+                                else 
+                                    button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id) View #{comment.reply_count} Replies
                                 div.comment_replies(id=comment.comment_id)
 
         script(type="text/javascript").
@@ -46,3 +46,5 @@ html
                 topic = '#{topic}';
         script(type="text/javascript", src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js")
         script(type="text/javascript", src="/assets/comments.js")
+
+ 
