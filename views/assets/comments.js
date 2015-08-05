@@ -126,7 +126,7 @@ var show_replies = function (comment_id, video_id, channel_id) {
 };
 
 show_more_link = function (page) {
-    $('body').append("<button id='linker' onClick='show_more("+page+")'>More</button>")
+    $('body').append("<button id='linker' onClick='show_more("+page+")'>Load More</button>")
 }
 
 show_more_link(2);
