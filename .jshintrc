@@ -1,5 +1,7 @@
 {
     browser: true,
+    node: true,
+    es5: true,
     esnext: true,
     globals: {},
     globalstrict: true,

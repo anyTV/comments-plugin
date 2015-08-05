@@ -173,3 +173,11 @@ exports.get_log_stream = function (dir) {
 exports.clone = function (obj) {
     return JSON.parse(JSON.stringify(obj));
 };
+
+exports.log_request = function (req, logger) {
+    logger.log('debug', '---REQUEST START---');
+    logger.log('debug', '--PATH--', JSON.stringify(req.originalUrl).split('?')[0]);
+    logger.log('debug', '--BODY--', JSON.stringify(req.body));
+    logger.log('debug', '--QUERY--', JSON.stringify(req.query));
+    logger.log('debug', '---REQUEST END---\n');
+};

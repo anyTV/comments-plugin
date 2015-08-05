@@ -14,6 +14,14 @@ var path = require('path'),
         return obj;
     },
 
+    to_param = function (params) {
+        return Object.keys(params)
+            .map(function(param) {
+                return encodeURIComponent(param) + '=' + encodeURIComponent(params[param]);
+            })
+            .join('&');
+    },
+
     config = {
         APP_NAME: 'anyTV Node Boilerplate',
 

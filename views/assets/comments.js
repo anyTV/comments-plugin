@@ -1,3 +1,5 @@
+$(".toplevelcomment").hide();
+
 $("#ajaxform").submit(function(e)
 {
     var postData = $(this).serializeArray();
@@ -26,7 +28,6 @@ $("#ajaxform").submit(function(e)
                 + '    </div>'
                 + '</div>'
                 + '');
-
             $('form')[0].comment.value = '';
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -43,12 +44,11 @@ $("#ajaxform").submit(function(e)
 });
 
 show_more = function (page) {
-    var type = $('form')[0].type.value;
-    page = page || 1;
+    var page = page || 1;
     $('#linker').remove();
 
     console.log($(this));
-    $.get('/'+topic+'?type='+type+'&page='+page, function (e) {
+    $.get('/'+topic+'?type=gamers_video'+'&page='+page, function (e) {
         e.forEach(function(comment) {
             $(".comments").append(''
                 + '<div class="comment group">'
@@ -63,15 +63,66 @@ show_more = function (page) {
                 + '            <span>'+comment.comment+'</span>'
                 + '        </div>'
                 + '    </div>'
-                + '</div>'
-                + '');
+                + '</div>');
         });
-        
+
         if ($('.comments .comment').size() < total_comments) {
             show_more_link(page + 1);
         }
 
     });
+};
+
+var show_replies = function (comment_id, video_id, channel_id) {
+    var target = $(event.currentTarget);
+
+    if(target.hasClass('unloaded')){
+        target.removeClass('unloaded');
+        target.addClass('loaded');
+        target.addClass('showing');
+        $.get(
+            '/youtube/get_comments?video_id='+video_id+'&parent_id='+comment_id+'&channel_id='+channel_id,
+            function (result) {
+                console.log(result);
+                result.forEach(function(comment) {
+                    console.log(comment.comment);
+                    $("#"+comment_id).append(''
+                        + '<div class="comment group">'
+                        + '    <div class="avatar">'
+                        + '        <img src="'+comment.avatar+'">'
+                        + '    </div>'
+                        + '    <div class="comment_box">'
+                        + '        <span class="date">'+comment.display_date+'</span>'
+                        + '        <div class="comment_container">'
+                        + '            <a href="'+comment.username_link+'" class="user">'+comment.username+'</a>'
+                        + '            <br>'
+                        + '            <span>'+comment.comment+'</span>'
+                        + '        </div>'
+                        + '    </div>'
+                        + '</div>');
+                        //$("#repbtn_"+comment_id).style.display = 'none';
+                });
+
+                $("#"+comment_id).slideDown();
+            });
+        target.text('Hide Replies');
+        return;
+    }
+
+    if(target.hasClass('showing')) {
+        target.text('Show Replies');
+        $("#"+comment_id).slideUp();
+        target.removeClass('showing');
+        target.addClass('hiding');
+        return;
+    }
+
+    if(target.hasClass('hiding') && target.hasClass('loaded')) {
+        $("#"+comment_id).slideDown();
+        target.text('Hide Replies');
+        target.removeClass('hiding');
+        target.addClass('showing');
+    }
 };
 
 show_more_link = function (page) {
