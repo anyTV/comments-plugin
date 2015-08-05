@@ -1,3 +1,5 @@
+$(".toplevelcomment").hide();
+
 $("#ajaxform").submit(function(e)
 {
     var postData = $(this).serializeArray();
@@ -95,6 +97,8 @@ var show_replies = function (comment_id, video_id, channel_id) {
                     + '</div>');
                     //$("#repbtn_"+comment_id).style.display = 'none';
             });
+
+            $("#"+comment_id).slideDown();
         }
     );
 };
