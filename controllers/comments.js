@@ -142,11 +142,12 @@ exports.get_comments_view = function (req, res, next) {
         user = util.get_data(['type'], ['token', 'email', 'username', 'channel_id', 'user_id', 'youtube_details'], req.query),
         comment_body,
         comments = [],
-        to_render,
         state = {},
         youtube_options = {
             online: false
         },
+        next_page_token = 2,
+        to_render,
 
         start = function () {
             if (typeof data === 'string') {
@@ -181,6 +182,7 @@ exports.get_comments_view = function (req, res, next) {
             }
 
             comments = result.comments;
+            next_page_token = result.nextPageToken;
 
             state.username = user.username;
             state.type = user.type;
@@ -227,6 +229,8 @@ exports.get_comments_view = function (req, res, next) {
             }
 
             to_render.comments = comments;
+            to_render.next_page_token = next_page_token;
+            
             to_render.total = result;
             to_render.avatar = 'http://www.gravatar.com/avatar/' + (MD5(user.email.trim()));
 
