@@ -22,9 +22,8 @@ $("#ajaxform").submit(function(e)
                     username,
                 author_link = user_details &&
                     'http://www.youtube.com/channel/' + user_details.attr('data-channelid') ||
-                    'http://www.gravatar.com/'+user,
+                    'http://www.gravatar.com/'+user;
 
-            console.log(user_details);
             $(".comments").prepend(''
                 + '<div class="comment group">'
                 + '    <div class="avatar">'

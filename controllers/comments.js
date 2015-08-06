@@ -145,7 +145,7 @@ exports.get_comments_view = function (req, res, next) {
         to_render,
         state = {},
         youtube_options = {
-            online: true
+            online: false
         },
 
         start = function () {
@@ -191,8 +191,6 @@ exports.get_comments_view = function (req, res, next) {
             auth_params.state = JSON.stringify(state);
 
             youtube_options.oauth_link = config.YOUTUBE.auth(auth_params);
-            youtube_options.online = !!(req.session && req.session.youtube_chat) ||
-                user.type !== 'gamers_video';
 
             Comment.get_total(data.topic_id, data.type, send_response);
         },
@@ -231,14 +229,15 @@ exports.get_comments_view = function (req, res, next) {
             to_render.comments = comments;
             to_render.total = result;
             to_render.avatar = 'http://www.gravatar.com/avatar/' + (MD5(user.email.trim()));
-            to_render.youtube_options = youtube_options;
 
             to_render.youtube_details = {};
 
-            if (req.query.youtube_details !== 'undefined') {
+            if (req.query.youtube_details && req.query.youtube_details !== 'undefined') {
                 to_render.youtube_details = JSON.parse(req.query.youtube_details);
+                youtube_options.online = true;
             }
 
+            to_render.youtube_options = youtube_options;
             res.render('comments', to_render);
         };
 

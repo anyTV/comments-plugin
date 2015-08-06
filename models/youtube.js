@@ -65,8 +65,6 @@ exports.get_comments = function (video_id, token, next) {
                 return next(err);
             }
 
-            console.log(result);
-
             return next(null, result);
         };
 
@@ -96,8 +94,8 @@ exports.get_total = function (video_id, next) {
         send_response = function (err, result) {
             if (err) {
                 next(err);
-            } 
-console.log(result.body);
+            }
+
             next(null, [{total:result.body.pageInfo.totalResults || result.body.items.length}]);
         };
 
