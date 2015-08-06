@@ -37,9 +37,9 @@ html
                             if comment.reply_count > 0
                                 br
                                 if comment.reply_count == 1
-                                    button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id) View #{comment.reply_count} Reply
+                                    button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id class='unloaded') View #{comment.reply_count} Reply
                                 else 
-                                    button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id) View #{comment.reply_count} Replies
+                                    button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id class='unloaded') View #{comment.reply_count} Replies
                                 div.comment_replies(id=comment.comment_id)
 
         script(type="text/javascript").
