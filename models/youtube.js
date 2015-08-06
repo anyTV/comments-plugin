@@ -21,6 +21,7 @@ exports.get_comments = function (video_id, token, next) {
 
         comment_body = {},
         comments = [],
+        to_return = {},
 
         start = function () {
             request.get(config.YOUTUBE.API_BASE_URL + '/commentThreads')
@@ -37,7 +38,7 @@ exports.get_comments = function (video_id, token, next) {
             }
 
             result = result.body;
-
+            to_return = result.nextPageToken;
              _(result.items).forEach(function (comment) {
                 comment_body = comment.snippet.topLevelComment.snippet;
                 comments.push({
@@ -55,6 +56,8 @@ exports.get_comments = function (video_id, token, next) {
                     video_id: comment.snippet.videoId
                 });
             }).commit();
+
+             to_return.comments = comments;
 
 
             send_response(null, comments);
