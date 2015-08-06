@@ -60,7 +60,8 @@ show_more = function (page) {
 
     console.log($(this));
     $.get('/'+topic+'?type=gamers_video'+'&page='+page, function (e) {
-        e.forEach(function(comment) {
+        console.log(e);
+        e.comments.forEach(function(comment) {
             $(".comments").append(''
                 + '<div class="comment group">'
                 + '    <div class="avatar">'
@@ -76,6 +77,8 @@ show_more = function (page) {
                 + '    </div>'
                 + '</div>');
         });
+
+
 
         if ($('.comments .comment').size() < total_comments) {
             show_more_link(page + 1);
@@ -139,5 +142,3 @@ var show_replies = function (comment_id, video_id, channel_id) {
 show_more_link = function (page) {
     $('body').append("<button id='linker' onClick='show_more("+page+")'>Load More</button>")
 }
-
-show_more_link(2);

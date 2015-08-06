@@ -31,6 +31,8 @@ html
 
         include ./commentsection.jade
 
+        button(id="linker" onclick="show_more('#{next_page_token}')") Load More
+
         script(type="text/javascript").
             var total_comments = #{total},
                 topic = '#{topic}';

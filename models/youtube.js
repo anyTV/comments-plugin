@@ -38,7 +38,7 @@ exports.get_comments = function (video_id, token, next) {
             }
 
             result = result.body;
-            to_return.nextPageToken = result.nextPageToken;
+            to_return.next_page_token = result.nextPageToken;
              _(result.items).forEach(function (comment) {
                 comment_body = comment.snippet.topLevelComment.snippet;
                 comments.push({

@@ -43,7 +43,7 @@ exports.get_comments = function (req, res, next) {
             if (err) {
                 return next(err);
             }
-
+            console.log(result);
             res.send(result);
         },
 
@@ -182,7 +182,7 @@ exports.get_comments_view = function (req, res, next) {
             }
 
             comments = result.comments;
-            next_page_token = result.nextPageToken;
+            next_page_token = result.next_page_token;
 
             state.username = user.username;
             state.type = user.type;
@@ -230,7 +230,7 @@ exports.get_comments_view = function (req, res, next) {
 
             to_render.comments = comments;
             to_render.next_page_token = next_page_token;
-            
+
             to_render.total = result;
             to_render.avatar = 'http://www.gravatar.com/avatar/' + (MD5(user.email.trim()));
 
