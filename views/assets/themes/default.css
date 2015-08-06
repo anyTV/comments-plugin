@@ -1,0 +1,30 @@
+body {
+	background: #262626 !important;
+}
+.login-warning {
+	color: #00828E !important;
+}
+.comment_box .date{
+	color: #00828E !important;
+}
+.comment_box button{
+	color: #00828E !important;
+}
+.comment_box button:hover {
+	color: #03a3b2 !important;
+}
+
+#linker {
+	background: #00828E !important;
+    border: 1px solid #03a3b2 !important;
+}
+#linker:hover {
+	background: #03a3b2 !important;
+}
+.comment_box textarea {
+	border-color: #03a3b2;
+}
+.post_comment .comment_box .post-button {
+	color: #00828E !important;
+	border: 1px solid #03a3b2 !important;
+}
