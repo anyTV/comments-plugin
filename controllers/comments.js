@@ -69,7 +69,7 @@ exports.get_comments = function (req, res, next) {
 
 exports.post_comments = function (req, res, next) {
     var reqs = util.get_data(['topic_id'], [], req.params),
-        data = util.get_data(['token', 'username', 'type', 'email'], ['comment'], req.body),
+        data = util.get_data(['token', 'username', 'type', 'email'], ['comment', 'access_token'], req.body),
         comment_data = {},
 
         start = function () {
@@ -114,10 +114,8 @@ exports.post_comments = function (req, res, next) {
                     '?video_id=' + reqs.topic_id +
                     '&channel_id=' + 'UCztAApmLSyQmgJW9DhQ6gfw' +
                     '&comment_text=' + data.comment +
-                    '&access_token=' +
-                        (req.session && req.session.youtube_chat &&
-                        req.session.youtube_chat.access_token) || 'empty'
-                    )
+                    '&access_token=' + data.access_token
+                )
                 .send()
                 .then(send_youtube_response);
         },
@@ -143,7 +141,7 @@ exports.post_comments = function (req, res, next) {
 
 exports.get_comments_view = function (req, res, next) {
     var data = util.get_data(['topic_id'], [], req.params),
-        user = util.get_data(['type'], ['token', 'email', 'username', 'channel_id', 'user_id'], req.query),
+        user = util.get_data(['type'], ['token', 'email', 'username', 'channel_id', 'user_id', 'youtube_details'], req.query),
         comment_body,
         comments = [],
         to_render,
@@ -237,8 +235,8 @@ exports.get_comments_view = function (req, res, next) {
             to_render.total = result;
             to_render.avatar = 'http://www.gravatar.com/avatar/' + (MD5(user.email.trim()));
             to_render.youtube_options = youtube_options;
+            to_render.youtube_details = JSON.parse(req.query.youtube_details || '{}');
 
-            console.log(req.session);
             res.render('comments', to_render);
         };
 
