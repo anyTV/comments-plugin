@@ -78,7 +78,9 @@ show_more = function (page) {
                 + '</div>');
         });
 
-
+        if(isNaN(e.next_page_token)) {
+            show_more_link(e.next_page_token);
+        }
 
         if ($('.comments .comment').size() < total_comments) {
             show_more_link(page + 1);
@@ -140,5 +142,5 @@ var show_replies = function (comment_id, video_id, channel_id) {
 };
 
 show_more_link = function (page) {
-    $('body').append("<button id='linker' onClick='show_more("+page+")'>Load More</button>")
+    $('body').append("<button id='linker' onClick='show_more(\""+page+"\")'>Load More</button>")
 }
