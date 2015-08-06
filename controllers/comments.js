@@ -42,9 +42,7 @@ exports.get_comments = function (req, res, next) {
         format_data = function (err, result) {
             if (err) {
                 return next(err);
-            } 
-
-            console.log('here', result)
+            }
 
             res.send(result);
         },
@@ -195,8 +193,7 @@ exports.get_comments_view = function (req, res, next) {
             youtube_options.oauth_link = config.YOUTUBE.auth(auth_params);
             youtube_options.online = !!(req.session && req.session.youtube_chat) ||
                 user.type !== 'gamers_video';
-            
-            
+
             Comment.get_total(data.topic_id, data.type, send_response);
         },
 
@@ -235,7 +232,12 @@ exports.get_comments_view = function (req, res, next) {
             to_render.total = result;
             to_render.avatar = 'http://www.gravatar.com/avatar/' + (MD5(user.email.trim()));
             to_render.youtube_options = youtube_options;
-            to_render.youtube_details = JSON.parse(req.query.youtube_details || '{}');
+
+            to_render.youtube_details = {};
+
+            if (req.query.youtube_details !== 'undefined') {
+                to_render.youtube_details = JSON.parse(req.query.youtube_details);
+            }
 
             res.render('comments', to_render);
         };
