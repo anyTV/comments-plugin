@@ -38,7 +38,7 @@ exports.get_comments = function (video_id, token, next) {
             }
 
             result = result.body;
-            to_return = result.nextPageToken;
+            to_return.nextPageToken = result.nextPageToken;
              _(result.items).forEach(function (comment) {
                 comment_body = comment.snippet.topLevelComment.snippet;
                 comments.push({
@@ -59,8 +59,7 @@ exports.get_comments = function (video_id, token, next) {
 
              to_return.comments = comments;
 
-
-            send_response(null, comments);
+            send_response(null, to_return);
         },
 
         send_response = function (err, result) {

@@ -180,7 +180,7 @@ exports.get_comments_view = function (req, res, next) {
                 return next(err);
             }
 
-            comments = result;
+            comments = result.comments;
 
             state.username = user.username;
             state.type = user.type;
