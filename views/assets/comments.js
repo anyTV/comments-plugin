@@ -13,15 +13,27 @@ $("#ajaxform").submit(function(e)
         type: "POST",
         data : postData,
         success:function(data, textStatus, jqXHR) {
+            var user_details = $('#user_details'),
+                avatar = user_details &&
+                    user_details.attr('data-avatar') ||
+                    'http://www.gravatar.com/avatar/' + user,
+                display_name = user_details &&
+                    user_details.attr('data-displayname') ||
+                    username,
+                author_link = user_details &&
+                    'http://www.youtube.com/channel/' + user_details.attr('data-channelid') ||
+                    'http://www.gravatar.com/'+user,
+
+            console.log(user_details);
             $(".comments").prepend(''
                 + '<div class="comment group">'
                 + '    <div class="avatar">'
-                + '        <img src="http://www.gravatar.com/avatar/'+user+'">'
+                + '        <img src="'+avatar+'">'
                 + '    </div>'
                 + '    <div class="comment_box">'
                 + '        <span class="date">a moment ago</span>'
                 + '        <div class="comment_container">'
-                + '            <a href="http://www.gravatar.com/'+user+'" class="user">'+username+'</a>'
+                + '            <a href="'+author_link+'" class="user">'+display_name+'</a>'
                 + '            <br>'
                 + '            <span>'+comment+'</span>'
                 + '        </div>'

@@ -7,10 +7,14 @@ html
     body
         .post_comment.comment.group
             .avatar
-                img(src=avatar)
+                if type === 'gamers_video' && youtube_details.user
+                    img(src=youtube_details.user.avatar)
+                    div#user_details(data-avatar=youtube_details.user.avatar data-displayname=youtube_details.user.display_name data-channelid=youtube_details.user.channel_id)
+                else
+                    img(src=avatar)
             .comment_box
                 if email && token && username
-                    if !youtube_options.online
+                    if type === 'gamers_video' && !youtube_details.access_token
                         a(href=youtube_options.oauth_link target='_parent' class='login') Login to Youtube
                     else
                         form#ajaxform(method="POST", action="/#{topic}")
@@ -19,6 +23,8 @@ html
                             input(type="hidden", name="type", value=type)
                             input(type="hidden", name="email", value=email)
                             input(type="hidden", name="username", value=username)
+                            if type === 'gamers_video'
+                                input#access(type="hidden", name="access_token", value=youtube_details.access_token)
                             input(type="submit", value="Post", class="post-button", style="float:right")
                 else
                         span.login-warning Please login to post
@@ -37,7 +43,7 @@ html
                                 br
                                 if comment.reply_count == 1
                                     button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id) View #{comment.reply_count} Reply
-                                else 
+                                else
                                     button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id) View #{comment.reply_count} Replies
                                 div.comment_replies(id=comment.comment_id)
 
@@ -46,5 +52,3 @@ html
                 topic = '#{topic}';
         script(type="text/javascript", src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js")
         script(type="text/javascript", src="/assets/comments.js")
-
- 
