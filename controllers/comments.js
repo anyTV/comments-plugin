@@ -8,7 +8,7 @@ var config = require(__dirname + '/../config/config'),
     MD5 = require('MD5'),
     _ = require('lodash'),
     moment = require('moment'),
-    cuddle = require('cuddle'),
+    cudl = require('cuddle'),
     User = require(__dirname + '/../models/user'),
     Comment = require(__dirname + '/../models/comment'),
     auth_params = {
@@ -107,7 +107,7 @@ exports.post_comments = function (req, res, next) {
                 return next(err);
             }
 
-            cuddle.get
+            cudl.get
                 .to(config.APP_BASE_URL + '/youtube/insert_comment_thread' +
                     '?video_id=' + reqs.topic_id +
                     '&channel_id=' + 'UCztAApmLSyQmgJW9DhQ6gfw' +
@@ -135,6 +135,29 @@ exports.post_comments = function (req, res, next) {
         };
 
     start();
+};
+
+exports.get_comment_section = function (req, res) {
+    var request_url = config.APP_BASE_URL + '/youtube/get_comment_threads'
+                + '?video_id='+req.query.video_id,
+
+    start = function () {
+
+        request_url += req.query.next_page_token ? 
+                        '&next_page_token=' + req.query.next_page_token : ''
+
+        cudl.get
+            .to(request_url)
+            .send()
+            .then(send_response);
+    },
+
+    send_response = function (err, result) {
+        res.send(result);
+    };
+
+    start();
+
 };
 
 exports.get_comments_view = function (req, res, next) {

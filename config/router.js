@@ -18,6 +18,7 @@ module.exports = function (router) {
     router.get('/:topic_id', c.comments.get_comments);
     router.post('/:topic_id', c.comments.post_comments);
     router.get('/embed/:topic_id', c.comments.get_comments_view);
+    router.get('/youtube/get_comment_page',c.comments.get_comment_section);
     router.get('/youtube/get_comment_threads', c.youtube.get_comment_threads);
     router.get('/youtube/get_comments', c.youtube.get_comments);
     router.get('/youtube/insert_comment_thread', c.youtube.post_comment_thread);
