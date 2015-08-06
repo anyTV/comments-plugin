@@ -140,6 +140,7 @@ exports.post_comments = function (req, res, next) {
 exports.get_comment_section = function (req, res) {
     var request_url = config.APP_BASE_URL + '/youtube/get_comment_threads'
                 + '?video_id='+req.query.video_id,
+        comments = [],
 
     start = function () {
 
@@ -152,8 +153,21 @@ exports.get_comment_section = function (req, res) {
             .then(send_response);
     },
 
+    transform_youtube_user = function (item) {
+        var transformed = {};
+        transformed.avatar = item.authorProfileImageUrl;
+        transformed.username_link = item.authorProfileImageUrl;
+        transformed.display_date = moment(item.publishedAt).fromNow();
+        transformed.comment = item.textDisplay;
+        return transformed;
+    },
+
     send_response = function (err, result) {
-        res.send(result);
+        console.log(result.items);
+        _(result.items).forEach(function (item) {
+            comments.push(item.snippet.topLevelComment);
+        }).commit();
+        res.send(comments);
     };
 
     start();
