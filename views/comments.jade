@@ -28,24 +28,8 @@ html
                                 input(type="submit", value="Post", class="post-button", style="float:right")
                     else
                             span.login-warning Please login to post
-        .comments
-            each comment in comments
-                .comment.group
-                    .avatar
-                        img(src=comment.avatar)
-                    .comment_box
-                        .comment_container
-                            a.user(href=comment.username_link) #{comment.username}
-                            span.date #{comment.display_date}
-                            br
-                            span #{comment.comment}
-                            if comment.reply_count > 0
-                                br
-                                if comment.reply_count == 1
-                                    button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id class='unloaded') View #{comment.reply_count} Reply
-                                else
-                                    button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id class='unloaded') View #{comment.reply_count} Replies
-                                div.comment_replies(id=comment.comment_id)
+
+        include ./commentsection.jade
 
         script(type="text/javascript").
             var total_comments = #{total},
