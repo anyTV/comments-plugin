@@ -9,22 +9,22 @@ html
             .avatar
                 img(src=avatar)
             .comment_box
-                if email && token && username
-                    if !youtube_options.online
-                        a(href=youtube_options.oauth_link target='_parent' class='login') Login to Youtube
+                form#ajaxform(method="POST", action="/#{topic}")
+                    input(type="hidden", name="type", value=type)
+                    if email && token && username
+                        if !youtube_options.online
+                            a(href=youtube_options.oauth_link target='_parent' class='login') Login to Youtube
+                        else
+                                textarea(name="comment")
+                                input(type="hidden", name="token", value=token)
+                                input(type="hidden", name="email", value=email)
+                                input(type="hidden", name="username", value=username)
+                                input(type="submit", value="Post", class="post-button", style="float:right")
                     else
-                        form#ajaxform(method="POST", action="/#{topic}")
-                            textarea(name="comment")
-                            input(type="hidden", name="token", value=token)
-                            input(type="hidden", name="type", value=type)
-                            input(type="hidden", name="email", value=email)
-                            input(type="hidden", name="username", value=username)
-                            input(type="submit", value="Post", class="post-button", style="float:right")
-                else
-                        span.login-warning Please login to post
+                            span.login-warning Please login to post
         .comments
             each comment in comments
-                .comment.group
+                .comment.group      	
                     .avatar
                         img(src=comment.avatar)
                     .comment_box

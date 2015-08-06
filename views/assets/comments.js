@@ -100,7 +100,7 @@ var show_replies = function (comment_id, video_id, channel_id) {
                         + '        </div>'
                         + '    </div>'
                         + '</div>');
-                        //$("#repbtn_"+comment_id).style.display = 'none';
+                    $("#repbtn_"+comment_id).hide();
                 });
 
                 $("#"+comment_id).show();
