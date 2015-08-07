@@ -139,7 +139,18 @@ exports.post_comments = function (req, res, next) {
 
 exports.get_comments_view = function (req, res, next) {
     var data = util.get_data(['topic_id'], [], req.params),
-        user = util.get_data(['type'], ['token', 'email', 'username', 'channel_id', 'user_id', 'youtube_details'], req.query),
+        user = util.get_data(
+            ['type'],
+            [
+                'token',
+                'email',
+                'username',
+                'channel_id',
+                'user_id',
+                'youtube_details',
+                'avatar'
+            ],
+            req.query),
         comment_body,
         comments = [],
         state = {},
@@ -147,6 +158,7 @@ exports.get_comments_view = function (req, res, next) {
             online: false
         },
         next_page_token = 2,
+        avatar = user.avatar,
         to_render,
 
         start = function () {
@@ -231,11 +243,10 @@ exports.get_comments_view = function (req, res, next) {
             to_render.comments = comments;
             to_render.next_page_token = next_page_token;
 
-            to_render.total = result;
-            to_render.avatar = 'http://www.gravatar.com/avatar/' + (MD5(user.email.trim()));
+            to_render.avatar = avatar;
 
             to_render.youtube_details = {};
-
+            console.log(user);
             if (req.query.youtube_details && req.query.youtube_details !== 'undefined') {
                 to_render.youtube_details = JSON.parse(req.query.youtube_details);
                 youtube_options.online = true;
