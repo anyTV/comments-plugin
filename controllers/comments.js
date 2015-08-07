@@ -43,7 +43,7 @@ exports.get_comments = function (req, res, next) {
             if (err) {
                 return next(err);
             }
-            console.log(result);
+
             res.send(result);
         },
 
@@ -140,8 +140,9 @@ exports.post_comments = function (req, res, next) {
 exports.get_comments_view = function (req, res, next) {
     var data = util.get_data(['topic_id'], [], req.params),
         user = util.get_data(
-            ['type'],
+            [],
             [
+                'type',
                 'token',
                 'email',
                 'username',
@@ -243,10 +244,11 @@ exports.get_comments_view = function (req, res, next) {
             to_render.comments = comments;
             to_render.next_page_token = next_page_token;
 
-            to_render.avatar = avatar;
+            to_render.avatar = (avatar !== 'undefined' && avatar) ||
+                ('http://www.gravatar.com/avatar/' + (MD5(user.email.trim())));
 
             to_render.youtube_details = {};
-            console.log(user);
+
             if (req.query.youtube_details && req.query.youtube_details !== 'undefined') {
                 to_render.youtube_details = JSON.parse(req.query.youtube_details);
                 youtube_options.online = true;
