@@ -16,18 +16,18 @@ html
                 form#ajaxform(method="POST", action="/#{topic}")
                     input(type="hidden", name="type", value=type)
                     if email && token && username
-                        if !youtube_options.online
+                        if !youtube_options.online && type === 'gamers_video'
                             a(href=youtube_options.oauth_link target='_parent' class='login') Login to Youtube
                         else
-                                textarea(name="comment")
-                                input(type="hidden", name="token", value=token)
-                                input(type="hidden", name="email", value=email)
-                                input(type="hidden", name="username", value=username)
+                            textarea(name="comment")
+                            input(type="hidden", name="token", value=token)
+                            input(type="hidden", name="email", value=email)
+                            input(type="hidden", name="username", value=username)
+                            input(type="submit", value="Post", class="post-button", style="float:right")
                             if type === 'gamers_video'
                                 input#access(type="hidden", name="access_token", value=youtube_details.access_token)
-                                input(type="submit", value="Post", class="post-button", style="float:right")
                     else
-                            span.login-warning Please login to post
+                        span.login-warning Please login to post
 
         include ./commentsection.jade
 
