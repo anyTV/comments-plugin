@@ -137,43 +137,6 @@ exports.post_comments = function (req, res, next) {
     start();
 };
 
-exports.get_comment_section = function (req, res) {
-    var request_url = config.APP_BASE_URL + '/youtube/get_comment_threads'
-                + '?video_id='+req.query.video_id,
-        comments = [],
-
-    start = function () {
-
-        request_url += req.query.next_page_token ? 
-                        '&next_page_token=' + req.query.next_page_token : ''
-
-        cudl.get
-            .to(request_url)
-            .send()
-            .then(send_response);
-    },
-
-    transform_youtube_user = function (item) {
-        var transformed = {};
-        transformed.avatar = item.authorProfileImageUrl;
-        transformed.username_link = item.authorProfileImageUrl;
-        transformed.display_date = moment(item.publishedAt).fromNow();
-        transformed.comment = item.textDisplay;
-        return transformed;
-    },
-
-    send_response = function (err, result) {
-        console.log(result.items);
-        _(result.items).forEach(function (item) {
-            comments.push(item.snippet.topLevelComment);
-        }).commit();
-        res.send(comments);
-    };
-
-    start();
-
-};
-
 exports.get_comments_view = function (req, res, next) {
     var data = util.get_data(['topic_id'], [], req.params),
         user = util.get_data(['type'], ['token', 'email', 'username', 'channel_id', 'user_id', 'youtube_details'], req.query),
