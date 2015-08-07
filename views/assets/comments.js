@@ -56,26 +56,14 @@ $("#ajaxform").submit(function(e)
 
 show_more = function (page) {
     var page = page || 1;
+
     $('#linker').remove();
 
     console.log($(this));
     $.get('/'+topic+'?type=gamers_video'+'&page='+page, function (e) {
         console.log(e);
         e.comments.forEach(function(comment) {
-            $(".comments").append(''
-                + '<div class="comment group">'
-                + '    <div class="avatar">'
-                + '        <img src="'+comment.avatar+'">'
-                + '    </div>'
-                + '    <div class="comment_box">'
-                + '        <span class="date">'+comment.display_date+'</span>'
-                + '        <div class="comment_container">'
-                + '            <a href="'+comment.username_link+'" class="user">'+comment.username+'</a>'
-                + '            <br>'
-                + '            <span>'+comment.comment+'</span>'
-                + '        </div>'
-                + '    </div>'
-                + '</div>');
+            $(".comments").append(get_comment_tpl(comment));
         });
 
         if(isNaN(e.next_page_token)) {
@@ -88,6 +76,41 @@ show_more = function (page) {
 
     });
 };
+
+get_comment_tpl = function (comment) {
+    var tpl = '<div class="comment group">'
+            + '    <div class="avatar">'
+            + '        <img src="'+comment.avatar+'">'
+            + '    </div>'
+            + '    <div class="comment_box">'
+            + '        <span class="date">'+comment.display_date+'</span>'
+            + '        <div class="comment_container">'
+            + '            <a href="'+comment.username_link+'" class="user">'+comment.username+'</a>'
+            + '            <br>'
+            + '            <span>'+comment.comment+'</span>'
+            +              get_reply_button_tpl (comment)
+            + '        </div>'
+            + '    </div>'
+            + '</div>';
+    return tpl;
+}
+
+get_reply_button_tpl = function (comment) {
+    var tpl = '<br/>'
+            + '<button id="repbtn_' + comment.comment_id + '" '
+            + 'class="reply_loader unloaded" '
+            + 'onClick=show_replies('
+            + '"' + comment.comment_id +'",'
+            + '"' + comment.video_id + '",'
+            + '"' + comment.channel_id + '")>'
+            + 'View ' + comment.reply_count + ' Replies';
+
+    tpl += '</button>'
+        + '<div id="' + comment.comment_id +'"'
+        + 'class="comment_replies"></div>';
+    
+    return comment.reply_count > 0 ? tpl : '';
+}
 
 var show_replies = function (comment_id, video_id, channel_id) {
     var target = $(event.currentTarget);
