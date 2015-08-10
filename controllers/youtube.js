@@ -12,6 +12,41 @@ var config = require(__dirname + '/../config/config'),
     moment = require('moment'),
     cuddle = require('cuddle');
 
+exports.get_channel_comments = function (req, res, next) {
+    var params = util.get_data(['channel_id'], ['next_page_token', 'last_saved'], req.query),
+        query = {
+            part: 'snippet',
+            textFormat: 'plainText',
+            key: API_KEY,
+            maxResults: 100,
+            order: 'time',
+            allThreadsRelatedToChannelId: params.channel_id,
+        },
+        comments = [],
+
+        start = function () {
+            params.last_saved = params.last_saved || moment();
+            superagent.get(API_BASE_URL + '/commentThreads')
+                .query(query)
+                .send()
+                .end(send_response);
+        },
+
+        send_response = function (err, result) {
+            if (err) {
+                return res.send(err);
+            }
+
+            comments = _.filter(result.body.items, function (item, key) {
+                return moment(item.snippet.topLevelComment.snippet.updatedAt).diff(moment(params.last_saved)) > 0;
+            });
+
+            return res.send(comments);
+        };
+
+    start();
+};
+
 exports.get_comment_threads = function (req, res, next) {
     var params = util.get_data(['video_id'], ['next_page_token'], req.query),
         query = {
