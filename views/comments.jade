@@ -7,44 +7,34 @@ html
     body
         .post_comment.comment.group
             .avatar
-                img(src=avatar)
+                if type === 'gamers_video' && youtube_details.user
+                    img(src=youtube_details.user.avatar)
+                    div#user_details(data-avatar=youtube_details.user.avatar data-displayname=youtube_details.user.display_name data-channelid=youtube_details.user.channel_id)
+                else
+                    img(src=avatar)
             .comment_box
-                if email && token && username
-                    if !youtube_options.online
-                        a(href=youtube_options.oauth_link target='_parent' class='login') Login to Youtube
-                    else
-                        form#ajaxform(method="POST", action="/#{topic}")
+                form#ajaxform(method="POST", action="/#{topic}")
+                    input(type="hidden", name="type", value=type)
+                    if email && token && username
+                        if !youtube_options.online && type === 'gamers_video'
+                            a(href=youtube_options.oauth_link target='_parent' class='login') Login to Youtube
+                        else
                             textarea(name="comment")
                             input(type="hidden", name="token", value=token)
-                            input(type="hidden", name="type", value=type)
                             input(type="hidden", name="email", value=email)
                             input(type="hidden", name="username", value=username)
                             input(type="submit", value="Post", class="post-button", style="float:right")
-                else
+                            if type === 'gamers_video'
+                                input#access(type="hidden", name="access_token", value=youtube_details.access_token)
+                    else
                         span.login-warning Please login to post
-        .comments
-            each comment in comments
-                .comment.group
-                    .avatar
-                        img(src=comment.avatar)
-                    .comment_box
-                        .comment_container
-                            a.user(href=comment.username_link) #{comment.username}
-                            span.date #{comment.display_date}
-                            br
-                            span #{comment.comment}
-                            if comment.reply_count > 0
-                                br
-                                if comment.reply_count == 1
-                                    button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id class='unloaded') View #{comment.reply_count} Reply
-                                else 
-                                    button.reply_loader(onclick="show_replies('#{comment.comment_id}', '#{comment.video_id}', '#{comment.channel_id}')" id='repbtn_'+comment.comment_id class='unloaded') View #{comment.reply_count} Replies
-                                div.comment_replies(id=comment.comment_id)
+
+        include ./commentsection.jade
+
+        button(id="linker" onclick="show_more('#{next_page_token}')") Load More
 
         script(type="text/javascript").
             var total_comments = #{total},
                 topic = '#{topic}';
         script(type="text/javascript", src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js")
         script(type="text/javascript", src="/assets/comments.js")
-
- 

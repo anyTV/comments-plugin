@@ -8,7 +8,7 @@ var config = require(__dirname + '/../config/config'),
     MD5 = require('MD5'),
     _ = require('lodash'),
     moment = require('moment'),
-    cuddle = require('cuddle'),
+    cudl = require('cuddle'),
     User = require(__dirname + '/../models/user'),
     Comment = require(__dirname + '/../models/comment'),
     auth_params = {
@@ -36,7 +36,15 @@ exports.get_comments = function (req, res, next) {
                 data.page = req.query.page;
             }
 
-            Comment.get_comments(data.topic_id, data.type, data.page, send_response);
+            Comment.get_comments(data.topic_id, data.type, data.page, data.type=='gamers_video' ? format_data : send_response);
+        },
+
+        format_data = function (err, result) {
+            if (err) {
+                return next(err);
+            }
+
+            res.send(result);
         },
 
         send_response = function (err, result) {
@@ -59,7 +67,7 @@ exports.get_comments = function (req, res, next) {
 
 exports.post_comments = function (req, res, next) {
     var reqs = util.get_data(['topic_id'], [], req.params),
-        data = util.get_data(['token', 'username', 'type', 'email'], ['comment'], req.body),
+        data = util.get_data(['token', 'username', 'type', 'email'], ['comment', 'access_token'], req.body),
         comment_data = {},
 
         start = function () {
@@ -99,15 +107,13 @@ exports.post_comments = function (req, res, next) {
                 return next(err);
             }
 
-            cuddle.get
+            cudl.get
                 .to(config.APP_BASE_URL + '/youtube/insert_comment_thread' +
                     '?video_id=' + reqs.topic_id +
                     '&channel_id=' + 'UCztAApmLSyQmgJW9DhQ6gfw' +
                     '&comment_text=' + data.comment +
-                    '&access_token=' +
-                        (req.session && req.session.youtube_chat &&
-                        req.session.youtube_chat.access_token) || 'empty'
-                    )
+                    '&access_token=' + data.access_token
+                )
                 .send()
                 .then(send_youtube_response);
         },
@@ -133,14 +139,28 @@ exports.post_comments = function (req, res, next) {
 
 exports.get_comments_view = function (req, res, next) {
     var data = util.get_data(['topic_id'], [], req.params),
-        user = util.get_data(['type'], ['token', 'email', 'username', 'channel_id', 'user_id'], req.query),
+        user = util.get_data(
+            [],
+            [
+                'type',
+                'token',
+                'email',
+                'username',
+                'channel_id',
+                'user_id',
+                'youtube_details',
+                'avatar'
+            ],
+            req.query),
         comment_body,
         comments = [],
-        to_render,
         state = {},
         youtube_options = {
-            online: true
+            online: false
         },
+        next_page_token = 2,
+        avatar = user.avatar,
+        to_render,
 
         start = function () {
             if (typeof data === 'string') {
@@ -166,15 +186,7 @@ exports.get_comments_view = function (req, res, next) {
                 suppress = user.email && delete user.email;
             }
 
-            if (user.type === 'gamers_video') {
-                cuddle.get
-                    .to(config.APP_BASE_URL + '/youtube/get_comment_threads?video_id=' + data.topic_id)
-                    .send()
-                    .then(get_total_youtube);
-                return;
-            }
-
-            Comment.get_comments(data.topic_id, data.type, 1, get_total);
+            Comment.get_comments(data.topic_id, user.type, 1, user.type === 'gamers_video' ? get_total_youtube : get_total);
         },
 
         get_total_youtube = function (err, result) {
@@ -182,23 +194,8 @@ exports.get_comments_view = function (req, res, next) {
                 return next(err);
             }
 
-            _(result.items).forEach(function (comment) {
-                comment_body = comment.snippet.topLevelComment.snippet;
-                comments.push({
-                    email: 'empty',
-                    type: 'gamers_video',
-                    username: comment_body.authorDisplayName,
-                    topic: comment_body.videoId,
-                    comment: comment_body.textDisplay,
-                    avatar: comment_body.authorProfileImageUrl,
-                    display_date: moment(comment_body.publishedAt).fromNow(),
-                    username_link: comment_body.authorChannelUrl,
-                    reply_count: comment.snippet.totalReplyCount,
-                    channel_id: comment.snippet.channelId,
-                    comment_id: comment.id,
-                    video_id: comment.snippet.videoId
-                });
-            }).commit();
+            comments = result.comments;
+            next_page_token = result.next_page_token;
 
             state.username = user.username;
             state.type = user.type;
@@ -209,9 +206,8 @@ exports.get_comments_view = function (req, res, next) {
             auth_params.state = JSON.stringify(state);
 
             youtube_options.oauth_link = config.YOUTUBE.auth(auth_params);
-            youtube_options.online = !!(req.session && req.session.youtube_chat) ||
-                user.type !== 'gamers_video';
-            send_response(null, result.items.length);
+
+            Comment.get_total(data.topic_id, data.type, send_response);
         },
 
         get_total = function (err, result) {
@@ -246,11 +242,18 @@ exports.get_comments_view = function (req, res, next) {
             }
 
             to_render.comments = comments;
-            to_render.total = result;
-            to_render.avatar = 'http://www.gravatar.com/avatar/' + (MD5(user.email.trim()));
-            to_render.youtube_options = youtube_options;
+            to_render.next_page_token = next_page_token;
 
-            console.log(req.session);
+            to_render.avatar = (avatar !== 'undefined' && avatar) || '/assets/images/male80.svg';
+
+            to_render.youtube_details = {};
+
+            if (req.query.youtube_details && req.query.youtube_details !== 'undefined') {
+                to_render.youtube_details = JSON.parse(req.query.youtube_details);
+                youtube_options.online = true;
+            }
+
+            to_render.youtube_options = youtube_options;
             res.render('comments', to_render);
         };
 
