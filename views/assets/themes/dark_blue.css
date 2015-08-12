@@ -1,0 +1,30 @@
+body {
+	background: #fff !important;
+}
+.login-warning {
+	color: #01579B !important;
+}
+.comment_box .date{
+	color: #01579B !important;
+}
+.comment_box button{
+	color: #01579B !important;
+}
+.comment_box button:hover {
+	color: #004b84 !important;
+}
+
+#linker {
+	background: #01579B !important;
+    border: 1px solid #004b84 !important;
+}
+#linker:hover {
+	background: #004b84 !important;
+}
+.comment_box textarea {
+	border-color: #004b84;
+}
+.post_comment .comment_box .post-button {
+	color: #01579B !important;
+	border: 1px solid #004b84 !important;
+}

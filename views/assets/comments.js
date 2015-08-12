@@ -117,7 +117,7 @@ get_reply_button_tpl = function (comment) {
     tpl += '</button>'
         + '<div id="' + comment.comment_id +'"'
         + 'class="comment_replies"></div>';
-    
+
     return comment.reply_count > 0 ? tpl : '';
 }
 
@@ -140,8 +140,8 @@ var show_replies = function (comment_id, video_id, channel_id) {
                         + '        <img src="'+comment.avatar+'">'
                         + '    </div>'
                         + '    <div class="comment_box">'
-                        + '        <span class="date">'+comment.display_date+'</span>'
                         + '        <div class="comment_container">'
+                        + '        <span class="date">'+comment.display_date+'</span>'
                         + '            <a href="'+comment.username_link+'" class="user">'+comment.username+'</a>'
                         + '            <br>'
                         + '            <span>'+comment.comment+'</span>'
