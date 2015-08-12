@@ -36,10 +36,11 @@ app.use('/assets', express.static(__dirname + '/views/assets'));
 
 app.use(cookie_parser('1234567890QWERTY'));
 app.use(session({
+    name: 'connect.comment.sid',
     cookie: {
         maxAge: 6000000
     },
-    secret: '1234567890QWERTY',
+    secret: config.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     store: redis_store_session
