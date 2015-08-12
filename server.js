@@ -34,7 +34,7 @@ logger.log('verbose', 'Binding custom middlewares');
 app.use(require('anytv-node-cors')(config.CORS));
 app.use('/assets', express.static(__dirname + '/views/assets'));
 
-app.use(cookie_parser('1234567890QWERTY'));
+app.use(cookie_parser(config.SESSION_SECRET));
 app.use(session({
     name: 'connect.comment.sid',
     cookie: {
