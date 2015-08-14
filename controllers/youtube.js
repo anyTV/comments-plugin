@@ -25,7 +25,7 @@ exports.get_channel_comments = function (req, res, next) {
             allThreadsRelatedToChannelId: params.channel_id,
         },
         payload,
-        comments = [],
+        comments = {},
         channel_ids = [],
         parallel_queries = [],
 
@@ -36,6 +36,7 @@ exports.get_channel_comments = function (req, res, next) {
 
         get_youtube_channels = function (err, result) {
             console.log(result);
+            result = [result[0]];
             parallel_queries = _.map(result, function (item) {
                 payload = {
                     part: 'snippet',
@@ -51,7 +52,7 @@ exports.get_channel_comments = function (req, res, next) {
                         .query(payload)
                         .send()
                         .end(function (_err, _result) {
-                            comments[item.channel_id] = _.filter(_result.body.items, function (comment, key) {
+                            comments[item.channel_id] = _.filter(_result.body.items, function (comment) {
                                 return moment(comment.snippet.topLevelComment.snippet.updatedAt).diff(moment(params.last_saved)) > 0;
                             });
 
@@ -171,7 +172,7 @@ exports.post_comment_thread = function (req, res, next) {
             }
         },
         response = {
-            endpoint: 'insert comment thread'
+            endpoint: 'insert comment thread',
         },
 
         start = function () {
@@ -193,6 +194,7 @@ exports.post_comment_thread = function (req, res, next) {
                 response.error = err;
             }
 
+            response.youtube_response = result.body;
             res.send(response);
         };
 

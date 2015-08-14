@@ -25,16 +25,16 @@ $("#ajaxform").submit(function(e)
                     'http://www.gravatar.com/'+user;
 
             $(".comments").prepend(''
-                + '<div class="comment group">'
+                + '<div id="comment_' + data.id + '"class="comment group">'
                 + '    <div class="avatar">'
-                + '        <img src="'+avatar+'">'
+                + '        <img src="' + avatar + '">'
                 + '    </div>'
                 + '    <div class="comment_box">'
                 + '        <span class="date">a moment ago</span>'
                 + '        <div class="comment_container">'
-                + '            <a href="'+author_link+'" class="user">'+display_name+'</a>'
+                + '            <a href="' + author_link + '" class="user">' + display_name + '</a>'
                 + '            <br>'
-                + '            <span>'+comment+'</span>'
+                + '            <span>' + comment + '</span>'
                 + '        </div>'
                 + '    </div>'
                 + '</div>'
@@ -63,10 +63,10 @@ show_more = function (page) {
 
 
     $('#linker').remove();
-    console.log("removed");
+
 
     $.get('/'+topic+'?type=' + type + '&page='+page, function (e) {
-        console.log(e);
+
 
         type === 'gamers_video' ? comment_array = e.comments : comment_array = e;
 
@@ -131,9 +131,7 @@ var show_replies = function (comment_id, video_id, channel_id) {
         $.get(
             '/youtube/get_comments?video_id='+video_id+'&parent_id='+comment_id+'&channel_id='+channel_id,
             function (result) {
-                console.log(result);
                 result.forEach(function(comment) {
-                    console.log(comment.comment);
                     $("#"+comment_id).append(''
                         + '<div class="comment group">'
                         + '    <div class="avatar">'

@@ -1,6 +1,6 @@
 .comments
     each comment in comments
-        .comment.group
+        .comment.group(id='comment_' + comment.comment_id)
             .avatar
                 img(src=comment.avatar)
             .comment_box

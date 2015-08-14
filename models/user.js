@@ -31,7 +31,7 @@ exports.get_youtube_channels = function (next) {
     var start = function () {
             mysql.open(config.GAMERS_DB)
                 .query(
-                    'SELECT channel_id from user_youtube',
+                    'SELECT channel_id, user_id from user_youtube',
                     [],
                     send_response
                 ).end();
