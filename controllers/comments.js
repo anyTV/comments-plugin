@@ -244,8 +244,7 @@ exports.get_comments_view = function (req, res, next) {
             to_render.comments = comments;
             to_render.next_page_token = next_page_token;
 
-            to_render.avatar = (avatar !== 'undefined' && avatar) ||
-                ('http://www.gravatar.com/avatar/' + (MD5(user.email.trim())));
+            to_render.avatar = (avatar !== 'undefined' && avatar) || '/assets/images/male80.svg';
 
             to_render.youtube_details = {};
 
