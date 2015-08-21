@@ -67,8 +67,9 @@ exports.get_comments = function (req, res, next) {
 
 exports.post_comments = function (req, res, next) {
     var reqs = util.get_data(['topic_id'], [], req.params),
-        data = util.get_data(['token', 'username', 'type', 'email'], ['comment', 'access_token'], req.body),
+        data = util.get_data(['token', 'username', 'type', 'email','user_id','channel_id'], ['comment', 'access_token'], req.body),
         comment_data = {},
+        youtube_response,
 
         start = function () {
             if (typeof data === 'string' || typeof reqs === 'string') {
@@ -123,7 +124,21 @@ exports.post_comments = function (req, res, next) {
                 return res.send({err: 'failed saving to youtube'});
             }
 
-            send_response();
+            youtube_response = result.youtube_response;
+
+            cudl.post
+                .to(config.BACKEND_BASE_URL + '/api/notifications')
+                .send({
+                    user_id: data.user_id,
+                    video_id: reqs.topic_id,
+                    action: 'commented_video',
+                    href: '/youtubers/' + data.user_id +
+                        '/list/' + data.channel_id +
+                        '/v/' + reqs.topic_id +
+                        '/comment/comment_' + youtube_response.id,
+                    read: 'false'
+                })
+                .then(send_response);
         },
 
         send_response = function (err, result) {
@@ -131,7 +146,7 @@ exports.post_comments = function (req, res, next) {
                 return next(err);
             }
 
-            res.send(result);
+            res.send(youtube_response);
         };
 
     start();

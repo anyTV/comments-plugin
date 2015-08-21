@@ -5,12 +5,75 @@
 var config = require(__dirname + '/../config/config'),
     API_BASE_URL = config.YOUTUBE.API_BASE_URL,
     API_KEY = config.YOUTUBE.API_KEY,
+    User = require(__dirname + '/../models/user'),
     google_auth_url = 'https://accounts.google.com/o/oauth2/token',
     util = require(__dirname + '/../helpers/util'),
     superagent = require('superagent'),
     _ = require('lodash'),
+    async = require('async'),
     moment = require('moment'),
     cuddle = require('cuddle');
+
+exports.get_channel_comments = function (req, res, next) {
+    var params = util.get_data(['channel_id'], ['next_page_token', 'last_saved'], req.query),
+        query = {
+            part: 'snippet',
+            textFormat: 'plainText',
+            key: API_KEY,
+            maxResults: 100,
+            order: 'time',
+            allThreadsRelatedToChannelId: params.channel_id,
+        },
+        payload,
+        comments = {},
+        channel_ids = [],
+        parallel_queries = [],
+
+        start = function () {
+            params.last_saved = params.last_saved || moment();
+            User.get_youtube_channels(get_youtube_channels);
+        },
+
+        get_youtube_channels = function (err, result) {
+            console.log(result);
+            result = [result[0]];
+            parallel_queries = _.map(result, function (item) {
+                payload = {
+                    part: 'snippet',
+                    textFormat: 'plainText',
+                    key: API_KEY,
+                    maxResults: 100,
+                    order: 'time',
+                    allThreadsRelatedToChannelId: item.channel_id,
+                };
+
+                return function (callback) {
+                    superagent.get(API_BASE_URL + '/commentThreads')
+                        .query(payload)
+                        .send()
+                        .end(function (_err, _result) {
+                            comments[item.channel_id] = _.filter(_result.body.items, function (comment) {
+                                return moment(comment.snippet.topLevelComment.snippet.updatedAt).diff(moment(params.last_saved)) > 0;
+                            });
+
+                            callback(null, _result.body);
+                        });
+                };
+            });
+
+            async.parallel(parallel_queries, send_response);
+        },
+
+        send_response = function (err, result) {
+            if (err) {
+                return res.send(err);
+            }
+
+            return res.send(comments);
+        };
+
+    start();
+};
 
 exports.get_comment_threads = function (req, res, next) {
     var params = util.get_data(['video_id'], ['next_page_token'], req.query),
@@ -109,7 +172,7 @@ exports.post_comment_thread = function (req, res, next) {
             }
         },
         response = {
-            endpoint: 'insert comment thread'
+            endpoint: 'insert comment thread',
         },
 
         start = function () {
@@ -131,6 +194,7 @@ exports.post_comment_thread = function (req, res, next) {
                 response.error = err;
             }
 
+            response.youtube_response = result.body;
             res.send(response);
         };
 

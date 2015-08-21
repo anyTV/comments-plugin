@@ -55,6 +55,13 @@ var path = require('path'),
             user: 'root',
             password: '',
             database: 'anytv_comments'
+        },
+
+        GAMERS_DB: {
+            host: 'localhost',
+            user: 'root',
+            password: '',
+            database: 'gamers_tm'
         }
 
     };

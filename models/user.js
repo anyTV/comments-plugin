@@ -26,3 +26,24 @@ exports.get_user_by_token = function (user_token, next) {
 
     start();
 };
+
+exports.get_youtube_channels = function (next) {
+    var start = function () {
+            mysql.open(config.GAMERS_DB)
+                .query(
+                    'SELECT channel_id, user_id from user_youtube',
+                    [],
+                    send_response
+                ).end();
+        },
+
+        send_response = function (err, result) {
+            if (err) {
+                return next(err);
+            }
+
+            next(null, result);
+        };
+
+    start();
+};
