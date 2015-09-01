@@ -52,7 +52,9 @@ exports.get_video_comments = function (req, res, next) {
                         next_page_token: result.body.nextPageToken
                     },
                     username: snippet.authorDisplayName,
-                    userid: snippet.authorChannelId.value,
+                    userid: snippet.authorChannelId
+                        ? snippet.authorChannelId.value
+                        : '',
                     videoid: snippet.videoId
                 });
             });
