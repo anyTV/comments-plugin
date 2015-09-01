@@ -25,6 +25,9 @@ module.exports = function (router) {
     router.get('/youtube/chat_callback', c.youtube.chat_callback);
     router.get('/youtube/get_channel_comments', c.youtube.get_channel_comments);
 
+    router.get('/video/comments', c.api.get_video_comments);
+
+
     router.all('*', function (req, res) {
         res.status(404)
             .send({
