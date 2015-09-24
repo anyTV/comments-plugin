@@ -43,7 +43,7 @@ windows: \WINDOWS\system32\drivers\etc
 
 #### Install packages
 
-- Run this commands :
+- Run these commands :
 
 ```sh
     npm i -g forever
@@ -82,10 +82,12 @@ Coding conventions
 Configuration
 ---------------------
 
-create config/env/development.js copy contents from config/env/sample.js
+create config/env/development.js. copy contents from config/env/sample.js
 ask fellow devs for the following keys
 
-SESSION_SECRET
-API_KEY
-client_id
-client_secret
+- SESSION_SECRET
+- API_KEY
+- client_id
+- client_secret
+
+or simply copy their development.js
